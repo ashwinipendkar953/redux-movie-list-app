@@ -1,8 +1,10 @@
 import { useDispatch } from "react-redux";
 import { deleteMovie, fetchMovies } from "./movieSlice";
+import { useNavigate } from "react-router-dom";
 
 const MovieList = ({ movies }) => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   return (
     <div className="container">
       {movies?.map((movie) => {
@@ -17,16 +19,28 @@ const MovieList = ({ movies }) => {
               <p className="mb-0">Genre: {movie?.genre}</p>
             </div>
 
-            <button
-              className="btn btn-danger "
-              onClick={() => {
-                dispatch(deleteMovie(movie?._id)).then(() => {
-                  dispatch(fetchMovies());
-                });
-              }}
-            >
-              Delete
-            </button>
+            <div className="d-flex gap-2">
+              <button
+                className="btn btn-success"
+                onClick={() =>
+                  navigate(`movies/${movie?._id}`, {
+                    state: { movie, isEdit: true },
+                  })
+                }
+              >
+                Edit
+              </button>
+              <button
+                className="btn btn-danger "
+                onClick={() => {
+                  dispatch(deleteMovie(movie?._id)).then(() => {
+                    dispatch(fetchMovies());
+                  });
+                }}
+              >
+                Delete
+              </button>
+            </div>
           </div>
         );
       })}

@@ -1,14 +1,17 @@
 import MovieForm from "./features/movies/MovieForm";
 import MovieView from "./features/movies/MovieView";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 function App() {
   return (
-    <div className="container my-3">
-      <h1>Movie List App</h1>
-      <MovieView />
-      <MovieForm />
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<MovieView />} />
+        <Route path="/movies" element={<MovieForm />} />
+        <Route path="/movies/:movieId" element={<MovieForm />} />
+      </Routes>
+    </Router>
   );
 }
 

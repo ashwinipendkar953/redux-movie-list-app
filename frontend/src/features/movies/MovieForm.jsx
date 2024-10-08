@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { addMovie, fetchMovies } from "./movieSlice";
+import { addMovie, editMovie, fetchMovies } from "./movieSlice";
+import { useLocation, useNavigate } from "react-router-dom";
 const INITIAL_FORM_DATA = {
   title: "",
   director: "",
@@ -10,6 +11,22 @@ const INITIAL_FORM_DATA = {
 const MovieForm = () => {
   const [formData, setFormData] = useState(INITIAL_FORM_DATA);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { state } = useLocation();
+  const { movie = {}, isEdit = false } = state || {};
+
+  useEffect(() => {
+    if (isEdit) {
+      setFormData({
+        title: movie.title,
+        director: movie.director,
+        genre: movie.genre,
+      });
+    } else {
+      setFormData(INITIAL_FORM_DATA);
+    }
+  }, [state]);
+
   const changeHandler = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -20,17 +37,24 @@ const MovieForm = () => {
 
   const submitHandler = (e) => {
     e.preventDefault();
-    if (formData.title && formData.director && formData.genre) {
+    const newFormData = isEdit ? { _id: movie?._id, ...formData } : formData;
+    // console.log(newFormData);
+
+    if (isEdit) {
+      dispatch(editMovie(newFormData)).then(() => {
+        navigate("/");
+      });
+    } else {
       dispatch(addMovie(formData)).then(() => {
-        dispatch(fetchMovies());
+        navigate("/");
       });
     }
     setFormData(INITIAL_FORM_DATA);
   };
 
   return (
-    <div>
-      <h2>Movie Form</h2>
+    <div className="container my-3">
+      <h1>{isEdit ? "Edit Movie Form" : "Movie Form"}</h1>
       <form action="" className="my-3" onSubmit={submitHandler}>
         <div className="mb-3">
           <label htmlFor="title" className="form-label">
@@ -75,7 +99,10 @@ const MovieForm = () => {
           />
         </div>
         <button type="submit" className="btn btn-primary">
-          Submit
+          {isEdit ? "Edit" : "Submit"}
+        </button>
+        <button className="btn btn-primary ms-2" onClick={() => navigate("/")}>
+          Go Back
         </button>
       </form>
     </div>

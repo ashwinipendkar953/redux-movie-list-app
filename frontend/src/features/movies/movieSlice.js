@@ -5,7 +5,7 @@ const apiUrl = import.meta.env.VITE_APP_API_URL;
 export const fetchMovies = createAsyncThunk("movies/fetchMovies", async () => {
   try {
     const response = await axios.get(`${apiUrl}/movies`);
-    console.log(response.data);
+    // console.log(response.data);
     return response.data;
   } catch (error) {
     throw new Error(error);
@@ -28,6 +28,22 @@ export const deleteMovie = createAsyncThunk(
     try {
       const response = await axios.delete(`${apiUrl}/movies/${movieId}`);
       console.log(response.data);
+      return response.data;
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+);
+
+export const editMovie = createAsyncThunk(
+  "movies/edit",
+  async (movieToUpdate) => {
+    try {
+      const response = await axios.post(
+        `${apiUrl}/movies/${movieToUpdate?._id}`,
+        movieToUpdate
+      );
+      //   console.log(response.data);
       return response.data;
     } catch (error) {
       throw new Error(error);
@@ -72,6 +88,16 @@ const movieSlice = createSlice({
         state.status = "success";
       })
       .addCase(deleteMovie.rejected, (state, action) => {
+        state.status = "error";
+        state.error = action?.error.message;
+      })
+      .addCase(editMovie.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(editMovie.fulfilled, (state) => {
+        state.status = "success";
+      })
+      .addCase(editMovie.rejected, (state, action) => {
         state.status = "error";
         state.error = action?.error.message;
       });
